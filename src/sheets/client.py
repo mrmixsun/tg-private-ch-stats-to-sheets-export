@@ -34,6 +34,15 @@ class SheetStorage:
                 df[col] = pd.to_datetime(df[col]).dt.strftime("%Y-%m-%d %H:%M:%S")
         return df
 
+    # меняем логику «затирания» на «добавление»
+    def append_data(self, sheet_name, new_data):
+    sheet = self._get_or_create_sheet(sheet_name)
+    for row in new_data:
+        # Преобразуем все значения в строки
+        values = [str(cell) if isinstance(cell, (date, datetime)) else cell for cell in row.values()]
+        sheet.append_row(values)
+    self.logger.info(f"Appended {len(new_data)} rows to '{sheet_name}'")
+    
     def merge_data(self, sheet_name, new_data, config):
         self.logger.info(f"Starting merge for sheet: '{sheet_name}' ...")
         sheet = self._get_or_create_sheet(sheet_name)
